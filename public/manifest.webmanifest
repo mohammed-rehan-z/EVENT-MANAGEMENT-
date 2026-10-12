@@ -1,0 +1,19 @@
+{
+  "name": "Universal Event Check-In & Gate Authority",
+  "short_name": "EventGate",
+  "description": "High-security event registration, single-use QR check-in, OTP verification and attendance system",
+  "start_url": "/scan",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0f172a",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
+  "categories": ["utilities", "business", "events"]
+}
