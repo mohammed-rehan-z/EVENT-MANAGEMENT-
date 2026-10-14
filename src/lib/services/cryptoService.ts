@@ -122,3 +122,66 @@ export function verifySecureQRPayload(rawInput: string): {
     };
   }
 }
+
+/**
+ * PBKDF2 Cryptographic Password Hashing (100,000 iterations, SHA-512)
+ */
+export function hashPassword(password: string, saltInput?: string): { hash: string; salt: string } {
+  const salt = saltInput || crypto.randomBytes(16).toString("hex");
+  const hash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512").toString("hex");
+  return { hash, salt };
+}
+
+/**
+ * Constant-time password verification to prevent timing attack side-channels
+ */
+export function verifyPassword(password: string, salt: string, expectedHash: string): boolean {
+  try {
+    const derivedHash = crypto.pbkdf2Sync(password, salt, 100000, 64, "sha512").toString("hex");
+    const derivedBuf = Buffer.from(derivedHash, "hex");
+    const expectedBuf = Buffer.from(expectedHash, "hex");
+
+    if (derivedBuf.length !== expectedBuf.length) {
+      return false;
+    }
+
+    return crypto.timingSafeEqual(derivedBuf, expectedBuf);
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Detects common SQL injection and malicious bypass vectors in user inputs
+ */
+export function detectSqlInjection(input: string): boolean {
+  if (!input || typeof input !== "string") return false;
+  
+  // Patterns commonly used in SQL injection and query manipulation
+  const sqlPatterns = [
+    /(\%27)|(\')|(\-\-)|(\%23)|(#)/i,
+    /\b(OR|AND)\b\s+[\w\d]+\s*=\s*[\w\d]+/i,
+    /\b(OR|AND)\b\s+['"].*['"]\s*=\s*['"]/i,
+    /\b(UNION\s+ALL\s+SELECT|UNION\s+SELECT)\b/i,
+    /\b(DROP|ALTER|CREATE|TRUNCATE)\s+(TABLE|DATABASE)\b/i,
+    /\b(INSERT\s+INTO|UPDATE\s+.*\s+SET|DELETE\s+FROM)\b/i,
+    /\b(SLEEP|BENCHMARK|PG_SLEEP|WAITFOR\s+DELAY)\b/i,
+    /(\/\*|\*\/|;)/i,
+    /\bEXEC(\s|\+)+(SP_|XP_)/i,
+  ];
+
+  return sqlPatterns.some((pattern) => pattern.test(input));
+}
+
+/**
+ * Validates strictly formatted email addresses free of injection payload characters
+ */
+export function isValidEmail(email: string): boolean {
+  if (!email || typeof email !== "string") return false;
+  if (email.length > 254) return false;
+  if (detectSqlInjection(email)) return false;
+
+  const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+  return emailRegex.test(email);
+}
+

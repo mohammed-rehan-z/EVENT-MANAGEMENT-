@@ -3,11 +3,17 @@
 -- 1. EXTENSIONS
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. USERS (Extends Supabase Auth if needed, or standalone for logic)
+-- 2. USERS (Event Portal User Accounts & Authentication)
 CREATE TABLE users (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     email TEXT UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    salt TEXT NOT NULL,
     full_name TEXT NOT NULL,
+    role TEXT NOT NULL DEFAULT 'VOLUNTEER',
+    avatar TEXT,
+    failed_attempts INTEGER DEFAULT 0,
+    locked_until TIMESTAMP WITH TIME ZONE,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

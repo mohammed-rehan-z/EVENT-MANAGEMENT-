@@ -77,8 +77,14 @@ export async function processRegistrationImport(
       const row = parsedData[index];
       if (!row || typeof row !== "object") continue;
 
-      // Extract Participant Name first
+      // Extract Participant Name / Team Leader Name
       const fullName = extractFieldValue(row, [
+        "Team Leader Name",
+        "Leader Name",
+        "Captain Name",
+        "Team Leader",
+        "Leader",
+        "Captain",
         "Full Name",
         "Name",
         "Participant Name",
@@ -121,19 +127,33 @@ export async function processRegistrationImport(
         ]);
       }
 
-      // CRITICAL FIX: If no team name is specified in the file, NEVER lump all rows together!
-      // Instead, treat it as an individual participant registration with their own distinct team pass.
+      // If no team name is specified in the file, treat it as an individual participant registration
       if (!rawTeamName) {
         rawTeamName = `Team - ${fullName}`;
       }
 
       const normalizedName = rawTeamName.trim().replace(/\s+/g, " ").toLowerCase();
 
+      // Prioritize Leader Email specifically for Google Forms
       const email =
-        extractFieldValue(row, ["Email", "Email Address", "Mail", "email", "e-mail"]) ||
-        `${fullName.toLowerCase().replace(/\s+/g, ".")}@example.com`;
+        extractFieldValue(row, [
+          "Team Leader Email",
+          "Leader Email",
+          "Captain Email",
+          "Leader Mail",
+          "Leader's Email",
+          "Team Leader Mail",
+          "Email Address",
+          "Email",
+          "Mail",
+          "email",
+          "e-mail",
+        ]) || `${fullName.toLowerCase().replace(/\s+/g, ".")}@example.com`;
 
       const mobileNumber = extractFieldValue(row, [
+        "Team Leader Mobile",
+        "Leader Mobile",
+        "Leader Phone",
         "Mobile Number",
         "Phone",
         "Mobile",
@@ -153,7 +173,7 @@ export async function processRegistrationImport(
 
       const semester = extractFieldValue(row, ["Semester", "Sem", "semester"]) || "5th";
 
-      const leaderField = extractFieldValue(row, ["Is Leader", "Leader", "Role", "Captain", "Role"]);
+      const leaderField = extractFieldValue(row, ["Is Leader", "Leader", "Role", "Captain"]);
       const isExplicitLeader =
         leaderField.toLowerCase().includes("leader") ||
         leaderField.toLowerCase().includes("capt") ||
@@ -170,6 +190,8 @@ export async function processRegistrationImport(
       }
 
       const currentTeam = teamsMap.get(normalizedName)!;
+      
+      // Add the Leader
       currentTeam.participants.push({
         full_name: fullName,
         email,
@@ -177,9 +199,47 @@ export async function processRegistrationImport(
         course: course || undefined,
         year_of_study: yearOfStudy || undefined,
         semester: semester || undefined,
-        // The first person added to the team is the leader unless another member was marked as leader
-        is_leader: isExplicitLeader || currentTeam.participants.length === 0,
+        is_leader: true, // The primary contact/leader
       });
+
+      // Check if this row also contains additional members in horizontal Google Form format (Member 2, Member 3, etc.)
+      for (let m = 2; m <= 10; m++) {
+        const memberName = extractFieldValue(row, [
+          `Member ${m} Name`,
+          `Member ${m}`,
+          `Player ${m} Name`,
+          `Player ${m}`,
+          `Participant ${m} Name`,
+          `Participant ${m}`,
+          `Member${m}Name`,
+          `Member${m}`,
+        ]);
+
+        if (memberName && memberName.trim() !== "") {
+          const memberEmail = extractFieldValue(row, [
+            `Member ${m} Email`,
+            `Member ${m} Mail`,
+            `Player ${m} Email`,
+            `Member${m}Email`,
+          ]) || `${memberName.toLowerCase().replace(/\s+/g, ".")}@example.com`;
+
+          const memberPhone = extractFieldValue(row, [
+            `Member ${m} Phone`,
+            `Member ${m} Mobile`,
+            `Member${m}Phone`,
+          ]);
+
+          currentTeam.participants.push({
+            full_name: memberName.trim(),
+            email: memberEmail,
+            mobile_number: memberPhone || undefined,
+            course,
+            year_of_study: yearOfStudy,
+            semester,
+            is_leader: false, // Team member, NOT leader (will not receive leader QR mail)
+          });
+        }
+      }
     }
 
     const processedTeams = Array.from(teamsMap.values());

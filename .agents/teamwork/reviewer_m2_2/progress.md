@@ -1,0 +1,21 @@
+# Progress - reviewer_m2_2
+
+- Last visited: 2026-10-14T18:45:00Z
+- Status: Completed review, adversarial testing, and verification
+- Steps completed:
+  - [x] Initialized DISPATCH.md and BRIEFING.md
+  - [x] Read ORIGINAL_REQUEST.md and PROJECT.md
+  - [x] Read docs/SECURITY.md and docs/IMPLEMENTATION_PLAN.md
+  - [x] Read worker_m2_retry/handoff.md
+  - [x] Read and inspect target implementation files (dataStore.ts, authService.ts, authActions.ts)
+  - [x] Verify each of the 6 core criteria:
+    - DualTierRateLimiter (Account Tier 5/15m, IP Tier 30/15m)
+    - Memory management: pruning of expired entries, stale key cleanup
+    - Selective account reset on login: clears account attempts while preserving IP bucket
+    - sanitizeUser and getDbUsers: strips password_hash, salt, password_salt
+    - DEFAULT_USERS: pre-hashed PBKDF2 credentials with 32-byte salts, 0 plaintext credentials
+    - Audit telemetry: emits AUTH_LOGIN_SUCCESS, AUTH_LOGIN_FAILURE, AUTH_LOCKOUT with event_id: null
+  - [x] Run verification commands: `npx.cmd tsc --noEmit` (passed, 0 errors) and `npm.cmd run build` (passed, 17/17 routes, 0 errors)
+  - [x] Run cryptographic & rate-limiting verification suite (33 passed, 0 failed)
+  - [x] Perform adversarial stress-testing (identified proxy IP spoofing surface, Map growth edge case, twin telemetry observation, and worker test file layout violation)
+  - [ ] Write handoff.md and send message to orchestrator

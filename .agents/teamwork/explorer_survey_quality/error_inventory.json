@@ -1,0 +1,911 @@
+[
+  {
+    "index": 1,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\audit\\page.tsx",
+    "line": 95,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 2,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\audit\\page.tsx",
+    "line": 103,
+    "column": 5,
+    "rule": "react-hooks/set-state-in-effect",
+    "message": "Error: Calling setState synchronously within an effect can trigger cascading renders",
+    "snippet": "loadLogs();"
+  },
+  {
+    "index": 3,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\audit\\page.tsx",
+    "line": 297,
+    "column": 70,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "onChange={(e) => setSelectedSeverity(e.target.value as any)}"
+  },
+  {
+    "index": 4,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\dashboard\\page.tsx",
+    "line": 66,
+    "column": 46,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const [eventData, setEventData] = useState<any>(null);"
+  },
+  {
+    "index": 5,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\dashboard\\page.tsx",
+    "line": 81,
+    "column": 38,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const [stats, setStats] = useState<any>({"
+  },
+  {
+    "index": 6,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\dashboard\\page.tsx",
+    "line": 103,
+    "column": 5,
+    "rule": "react-hooks/set-state-in-effect",
+    "message": "Error: Calling setState synchronously within an effect can trigger cascading renders",
+    "snippet": "loadEventData();"
+  },
+  {
+    "index": 7,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\dashboard\\page.tsx",
+    "line": 846,
+    "column": 71,
+    "rule": "react/no-unescaped-entities",
+    "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+    "snippet": "Delete <strong className=\"font-semibold text-red-950\">\"{eventData?.name || eventId}\"</strong>?"
+  },
+  {
+    "index": 8,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\dashboard\\page.tsx",
+    "line": 846,
+    "column": 100,
+    "rule": "react/no-unescaped-entities",
+    "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+    "snippet": "Delete <strong className=\"font-semibold text-red-950\">\"{eventData?.name || eventId}\"</strong>?"
+  },
+  {
+    "index": 9,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\imports\\page.tsx",
+    "line": 15,
+    "column": 48,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "function extractKeyFromRow(row: Record<string, any>, candidateKeywords: string[]): string {"
+  },
+  {
+    "index": 10,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\imports\\page.tsx",
+    "line": 39,
+    "column": 50,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const [previewData, setPreviewData] = useState<any[] | null>(null);"
+  },
+  {
+    "index": 11,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\imports\\page.tsx",
+    "line": 140,
+    "column": 21,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const bulkRows: any[] = [];"
+  },
+  {
+    "index": 12,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\imports\\page.tsx",
+    "line": 202,
+    "column": 27,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const parsedData: any[] = XLSX.utils.sheet_to_json(worksheet);"
+  },
+  {
+    "index": 13,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\imports\\page.tsx",
+    "line": 213,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 14,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\imports\\page.tsx",
+    "line": 220,
+    "column": 39,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const autoDetectTeamColumn = (data: any[]) => {"
+  },
+  {
+    "index": 15,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\imports\\page.tsx",
+    "line": 250,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 16,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\imports\\page.tsx",
+    "line": 453,
+    "column": 65,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "{Object.values(row).slice(0, 6).map((val: any, i) => ("
+  },
+  {
+    "index": 17,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\registrations\\page.tsx",
+    "line": 172,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 18,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\registrations\\page.tsx",
+    "line": 180,
+    "column": 5,
+    "rule": "react-hooks/set-state-in-effect",
+    "message": "Error: Calling setState synchronously within an effect can trigger cascading renders",
+    "snippet": "loadTeams();"
+  },
+  {
+    "index": 19,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\[eventId]\\registrations\\page.tsx",
+    "line": 370,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 20,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\page.tsx",
+    "line": 125,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 21,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\page.tsx",
+    "line": 133,
+    "column": 5,
+    "rule": "react-hooks/set-state-in-effect",
+    "message": "Error: Calling setState synchronously within an effect can trigger cascading renders",
+    "snippet": "loadEvents();"
+  },
+  {
+    "index": 22,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\page.tsx",
+    "line": 1406,
+    "column": 88,
+    "rule": "react/no-unescaped-entities",
+    "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+    "snippet": "You are about to delete <strong className=\"font-semibold text-red-950\">\"{deleteEventTarget.name}\"</strong> (ID: {deleteEventTarget.id})."
+  },
+  {
+    "index": 23,
+    "file": "D:\\Project\\Event Management\\src\\app\\(admin)\\events\\page.tsx",
+    "line": 1406,
+    "column": 113,
+    "rule": "react/no-unescaped-entities",
+    "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`.",
+    "snippet": "You are about to delete <strong className=\"font-semibold text-red-950\">\"{deleteEventTarget.name}\"</strong> (ID: {deleteEventTarget.id})."
+  },
+  {
+    "index": 24,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 47,
+    "column": 65,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;"
+  },
+  {
+    "index": 25,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 111,
+    "column": 50,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const [scannedTeam, setScannedTeam] = useState<any | null>(null);"
+  },
+  {
+    "index": 26,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 168,
+    "column": 16,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "let timer: any;"
+  },
+  {
+    "index": 27,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 180,
+    "column": 7,
+    "rule": "react-hooks/immutability",
+    "message": "Error: Cannot access variable before it is declared",
+    "snippet": "handleLookupToken(initialToken);"
+  },
+  {
+    "index": 28,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 215,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 29,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 234,
+    "column": 46,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "advanced: [{ torch: nextState } as any],"
+  },
+  {
+    "index": 30,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 298,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 31,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 331,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 32,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 353,
+    "column": 55,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const leader = res.team.participants.find((p: any) => p.is_leader) || res.team.participants[0];"
+  },
+  {
+    "index": 33,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 384,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 34,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 401,
+    "column": 58,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const leader = scannedTeam.participants.find((p: any) => p.is_leader) || scannedTeam.participants[0];"
+  },
+  {
+    "index": 35,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 424,
+    "column": 48,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "setIsDuplicateAlert(Boolean((result as any).alreadyCheckedIn));"
+  },
+  {
+    "index": 36,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 425,
+    "column": 46,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "setIsExpiredAlert(Boolean((result as any).isExpired));"
+  },
+  {
+    "index": 37,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 430,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 38,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 559,
+    "column": 47,
+    "rule": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+    "snippet": "Point camera at the attendee's signed mobile QR pass or printed badge."
+  },
+  {
+    "index": 39,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 605,
+    "column": 38,
+    "rule": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+    "snippet": "Enter or paste the team's QR Token, SECQR payload, or Team Name."
+  },
+  {
+    "index": 40,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 687,
+    "column": 50,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "{scannedTeam.participants?.map((p: any) => ("
+  },
+  {
+    "index": 41,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\page.tsx",
+    "line": 741,
+    "column": 96,
+    "rule": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+    "snippet": "<span className=\"text-emerald-700 font-medium\">Code dispatched to captain's email.</span>"
+  },
+  {
+    "index": 42,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\teams\\page.tsx",
+    "line": 61,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 43,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\teams\\page.tsx",
+    "line": 69,
+    "column": 5,
+    "rule": "react-hooks/set-state-in-effect",
+    "message": "Error: Calling setState synchronously within an effect can trigger cascading renders",
+    "snippet": "loadTeams();"
+  },
+  {
+    "index": 44,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\teams\\page.tsx",
+    "line": 89,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 45,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\teams\\page.tsx",
+    "line": 320,
+    "column": 45,
+    "rule": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+    "snippet": "Try searching by team name like 'Cyber Knights' or leader name like 'Alex Vance'."
+  },
+  {
+    "index": 46,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\teams\\page.tsx",
+    "line": 320,
+    "column": 59,
+    "rule": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+    "snippet": "Try searching by team name like 'Cyber Knights' or leader name like 'Alex Vance'."
+  },
+  {
+    "index": 47,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\teams\\page.tsx",
+    "line": 320,
+    "column": 81,
+    "rule": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+    "snippet": "Try searching by team name like 'Cyber Knights' or leader name like 'Alex Vance'."
+  },
+  {
+    "index": 48,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\teams\\page.tsx",
+    "line": 320,
+    "column": 92,
+    "rule": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+    "snippet": "Try searching by team name like 'Cyber Knights' or leader name like 'Alex Vance'."
+  },
+  {
+    "index": 49,
+    "file": "D:\\Project\\Event Management\\src\\app\\(volunteer)\\scan\\teams\\page.tsx",
+    "line": 569,
+    "column": 53,
+    "rule": "react/no-unescaped-entities",
+    "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`.",
+    "snippet": "Code dispatched to captain's inbox"
+  },
+  {
+    "index": 50,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\authActions.ts",
+    "line": 11,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 51,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\eventActions.ts",
+    "line": 41,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 52,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\eventActions.ts",
+    "line": 70,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 53,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\eventActions.ts",
+    "line": 99,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 54,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\eventActions.ts",
+    "line": 113,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 55,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\eventActions.ts",
+    "line": 124,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 56,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\importData.ts",
+    "line": 7,
+    "column": 48,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "function extractFieldValue(row: Record<string, any>, candidateKeywords: string[]): string {"
+  },
+  {
+    "index": 57,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\importData.ts",
+    "line": 53,
+    "column": 15,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "parsedData: any[],"
+  },
+  {
+    "index": 58,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\importData.ts",
+    "line": 236,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 59,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 35,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 60,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 59,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 61,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 103,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 62,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 148,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 63,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 174,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 64,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 202,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 65,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 211,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 66,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 222,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 67,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 234,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 68,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 246,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 69,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 296,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 70,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 349,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 71,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 378,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 72,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 393,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 73,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 407,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 74,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 421,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 75,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 435,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 76,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 455,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 77,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 467,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 78,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 482,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 79,
+    "file": "D:\\Project\\Event Management\\src\\app\\actions\\qrActions.ts",
+    "line": 496,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 80,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\checkin\\route.ts",
+    "line": 64,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 81,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\export\\route.ts",
+    "line": 64,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 82,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\health\\route.ts",
+    "line": 22,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 83,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\import\\route.ts",
+    "line": 31,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 84,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\teams\\[teamId]\\email\\route.ts",
+    "line": 49,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 85,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\teams\\[teamId]\\route.ts",
+    "line": 23,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 86,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\teams\\[teamId]\\route.ts",
+    "line": 58,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 87,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\teams\\route.ts",
+    "line": 9,
+    "column": 65,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const checkInStatus = (searchParams.get(\"checkInStatus\") as any) || undefined;"
+  },
+  {
+    "index": 88,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\teams\\route.ts",
+    "line": 10,
+    "column": 61,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const emailStatus = (searchParams.get(\"emailStatus\") as any) || undefined;"
+  },
+  {
+    "index": 89,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\teams\\route.ts",
+    "line": 23,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 90,
+    "file": "D:\\Project\\Event Management\\src\\app\\api\\teams\\route.ts",
+    "line": 63,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 91,
+    "file": "D:\\Project\\Event Management\\src\\app\\page.tsx",
+    "line": 56,
+    "column": 21,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 92,
+    "file": "D:\\Project\\Event Management\\src\\lib\\dataStore.ts",
+    "line": 96,
+    "column": 27,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "details: Record<string, any>;"
+  },
+  {
+    "index": 93,
+    "file": "D:\\Project\\Event Management\\src\\lib\\dataStore.ts",
+    "line": 417,
+    "column": 33,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "dbTeams.map(async (t: any) => {"
+  },
+  {
+    "index": 94,
+    "file": "D:\\Project\\Event Management\\src\\lib\\services\\cryptoService.ts",
+    "line": 116,
+    "column": 17,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 95,
+    "file": "D:\\Project\\Event Management\\src\\lib\\services\\emailService.ts",
+    "line": 41,
+    "column": 38,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "static async sendQrPassEmail(team: any, recipientOverride?: string): Promise<{"
+  },
+  {
+    "index": 96,
+    "file": "D:\\Project\\Event Management\\src\\lib\\services\\emailService.ts",
+    "line": 44,
+    "column": 14,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "record?: any;"
+  },
+  {
+    "index": 97,
+    "file": "D:\\Project\\Event Management\\src\\lib\\services\\emailService.ts",
+    "line": 46,
+    "column": 48,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "const leader = team.participants?.find((p: any) => p.is_leader) || team.participants?.[0];"
+  },
+  {
+    "index": 98,
+    "file": "D:\\Project\\Event Management\\src\\lib\\services\\emailService.ts",
+    "line": 225,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 99,
+    "file": "D:\\Project\\Event Management\\src\\lib\\services\\emailService.ts",
+    "line": 328,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 100,
+    "file": "D:\\Project\\Event Management\\src\\lib\\services\\qrService.ts",
+    "line": 32,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  },
+  {
+    "index": 101,
+    "file": "D:\\Project\\Event Management\\src\\lib\\services\\qrService.ts",
+    "line": 48,
+    "column": 19,
+    "rule": "@typescript-eslint/no-explicit-any",
+    "message": "Unexpected any. Specify a different type.",
+    "snippet": "} catch (err: any) {"
+  }
+]

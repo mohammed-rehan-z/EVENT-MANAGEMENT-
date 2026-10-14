@@ -1,0 +1,427 @@
+# Milestone 2 Exploration Report: Signed Session Tokens & Cookie Security
+
+**Agent Identity:** `explorer_m2_2`  
+**Milestone:** M2 — Authentication & Account Lifecycle Hardening  
+**Scope:** Session Token Serialization, Cryptographic Signing, Verification, Cookie Security, and App Router Dynamic Prerendering  
+**Target Files:** `src/lib/services/authService.ts`, `src/app/actions/authActions.ts`, with cross-boundary impacts on `src/proxy.ts`
+
+---
+
+## 1. Observation
+
+### 1.1 Insecure Session Serialization & Cookie Issuance in `authService.ts`
+In `src/lib/services/authService.ts` (lines 220–228), the session cookie is written as raw, unencrypted, unsigned JSON:
+```typescript
+// Lines 220-228 of src/lib/services/authService.ts:
+// 8. Issue HTTP-Only, SameSite, Secure session cookie
+const cookieStore = await cookies();
+cookieStore.set(COOKIE_NAME, JSON.stringify(sessionUser), {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+  path: "/",
+  maxAge: 60 * 60 * 24 * 7, // 7 days
+});
+```
+
+### 1.2 Unverified Session Deserialization in `authService.ts` and `proxy.ts`
+In `src/lib/services/authService.ts` (lines 239–248), session retrieval directly parses the cookie value without integrity validation or timestamp checks:
+```typescript
+// Lines 239-248 of src/lib/services/authService.ts:
+static async getCurrentUser(): Promise<UserAccount | null> {
+  try {
+    const cookieStore = await cookies();
+    const session = cookieStore.get(COOKIE_NAME);
+    if (!session || !session.value) return null;
+    return JSON.parse(session.value) as UserAccount;
+  } catch {
+    return null;
+  }
+}
+```
+Furthermore, in `src/proxy.ts` (lines 16–25), the Next.js edge proxy (middleware) also blindly trusts raw `JSON.parse`:
+```typescript
+// Lines 16-25 of src/proxy.ts:
+const sessionCookie = request.cookies.get("event_auth_session")?.value;
+let user: { id: string; email: string; role: string; fullName: string } | null = null;
+
+if (sessionCookie) {
+  try {
+    user = JSON.parse(sessionCookie);
+  } catch {
+    user = null;
+  }
+}
+```
+Direct Observation: An attacker sending an arbitrary cookie `Cookie: event_auth_session={"id":"usr-1","email":"admin@eventportal.com","role":"ADMIN","fullName":"Attacker"}` is immediately granted full access to protected routes (`/events/*`, `/api/export`, `/api/import`) without ever authenticating.
+
+### 1.3 Absence of Timestamp, Lifespan, and Replay Protection
+Neither `sessionUser` nor the cookie contents contain `issuedAt` or `expiresAt` timestamps. A session cookie once issued or forged remains valid indefinitely until manually deleted from the browser.
+
+### 1.4 Environment Configuration & Secret State
+Inspection of `.env.example` (lines 45–56) reveals:
+```bash
+SESSION_SECRET=e4c83b8a129ef3c09b2e5a7d6f1a8c4e2b0d9f8e7a6c5b4d3e2f1a0b9c8d7e6f
+AUTH_SECRET=e4c83b8a129ef3c09b2e5a7d6f1a8c4e2b0d9f8e7a6c5b4d3e2f1a0b9c8d7e6f
+SESSION_MAX_AGE_DAYS=7
+```
+`Get-ChildItem -Path . -Filter ".env*" -Force` verified that no `.env.local` or `.env` currently exists in the workspace. Any runtime access to `process.env.SESSION_SECRET` will return `undefined` unless fallback handling is implemented or `.env.local` is provided.
+
+### 1.5 Next.js App Router & Prerendering Configuration
+Inspection of `next.config.ts` (lines 10–11) confirmed:
+```typescript
+cacheComponents: true,
+partialPrefetching: true,
+```
+Documentation in `node_modules/next/dist/docs/01-app/02-guides/migrating-to-cache-components.md` (lines 727–730) establishes:
+> "Wrap runtime data access in `<Suspense>`. Without Cache Components, reading `cookies()`, `headers()`, or `searchParams` opts the whole route into dynamic rendering. With Cache Components, accessing them outside a `<Suspense>` boundary surfaces the blocking-prerender-runtime insight."
+
+Build verification (`npm.cmd run build`) completed successfully (exit code 0):
+- Routes with dynamic session access (`/scan`, `/scan/teams`, `/events/[eventId]/*`) generate as `◐ (Partial Prerender)` because their layouts wrap `AuthService.getCurrentUser()` call sites in `<Suspense>` (`src/app/(volunteer)/layout.tsx:123`, `src/app/(admin)/events/[eventId]/layout.tsx:326`).
+- Static pages like `/events` (line 1 of `src/app/(admin)/events/page.tsx`: `"use client"`) invoke `getSessionUserAction()` via Server Action inside `useEffect`, preventing blocking prerender issues.
+
+---
+
+## 2. Logic Chain
+
+1. **Vulnerability Identification (Observations 1.1 & 1.2):**
+   Because `COOKIE_NAME` stores raw `JSON.stringify(sessionUser)`, any client or intermediary can tamper with `role: "ADMIN"`, spoofing identities with zero cryptographic friction.
+
+2. **Tamper-Evident Format Specification:**
+   To prevent spoofing and tampering, the cookie value must be serialized as `<base64UrlPayload>.<hmacSignature>`:
+   - `base64UrlPayload`: A base64url-encoded string of the JSON-serialized `SessionPayload`.
+   - `hmacSignature`: A 64-character lowercase hex string generated by `crypto.createHmac("sha256", secret).update(base64UrlPayload).digest("hex")`.
+   - Modifying any character of the payload changes its base64url representation, invalidating the HMAC signature.
+
+3. **Cryptographic Validation & Constant-Time Security:**
+   Verification must:
+   - Recompute `expectedSigHex` over the received `payloadBase64Url`.
+   - Compare `Buffer.from(signatureHex, "hex")` and `Buffer.from(expectedSigHex, "hex")` using `crypto.timingSafeEqual` to thwart timing side-channel attacks.
+   - Guard against unequal buffer lengths before calling `crypto.timingSafeEqual`, as unequal lengths cause Node's crypto API to throw a `TypeError`.
+
+4. **Timestamp & Expiration Enforcement (Observation 1.3):**
+   The payload must include integer UNIX epoch seconds:
+   - `issuedAt = Math.floor(Date.now() / 1000)`
+   - `expiresAt = issuedAt + lifetimeSeconds`
+   - During verification, `Math.floor(Date.now() / 1000) > payload.expiresAt` immediately fails validation.
+   - Clock skew tolerance of up to 60 seconds is permitted for `issuedAt > nowSec + 60`.
+
+5. **Secret Resolution Hierarchy & Fallback Policy (Observation 1.4):**
+   - Attempt retrieval from `process.env.SESSION_SECRET`.
+   - If unset, fall back to `process.env.AUTH_SECRET`.
+   - Require a minimum entropy length of 32 characters (256 bits).
+   - In production (`process.env.NODE_ENV === "production"`), missing or weak secret MUST throw a fatal configuration exception.
+   - In development/test, emit a visible `console.warn` alert and fall back to a fixed 32-character development secret (`"dev-insecure-session-secret-at-least-32-chars-long-do-not-use-in-production"`). Using a fixed development secret rather than an ephemeral random byte array per process ensures local developer sessions persist across Next.js Hot Module Replacement (HMR) and fast-refresh recompilations.
+
+6. **Cookie Security Posture:**
+   - `httpOnly: true`: Blocks client-side JavaScript (`document.cookie`) access, eliminating XSS token theft.
+   - `secure: process.env.NODE_ENV === "production"`: Enforces HTTPS in production while permitting local HTTP (`localhost:3000`).
+   - `sameSite: "lax"`: Shields against CSRF on state-changing requests while preserving top-level external navigation.
+   - `path: "/"`: Ensures coverage across all application paths.
+   - `maxAge`: Synchronized with `lifetimeSeconds` (604,800s / 7 days for `ADMIN`; 86,400s / 24 hours for `VOLUNTEER`).
+
+7. **Next.js App Router Dynamic Prerendering Safety (Observation 1.5):**
+   - `cookies()` is an async Request-Time API in Next.js 16 (`const cookieStore = await cookies();`).
+   - In server components, `AuthService.getCurrentUser()` must remain encapsulated within `<Suspense>` boundaries to preserve Partial Prerendering (`◐`).
+   - `AuthService.getCurrentUser()` must catch runtime errors (e.g., when evaluated outside a request context during static page collection or offline unit tests) and return `null` gracefully.
+
+---
+
+## 3. Technical Strategy & Implementation Specification
+
+### 3.1 Type Definitions
+In `src/lib/services/authService.ts`:
+```typescript
+export interface UserAccount {
+  id: string;
+  email: string;
+  fullName: string;
+  role: "ADMIN" | "VOLUNTEER";
+  avatar: string;
+}
+
+export interface SessionPayload {
+  id: string;                  // Canonical user ID
+  userId: string;              // Canonical user ID (alias for id)
+  email: string;               // Normalized lowercase email
+  role: "ADMIN" | "VOLUNTEER"; // User role
+  fullName: string;            // User's full display name
+  avatar?: string;             // Optional avatar URL or initials
+  issuedAt: number;            // Unix epoch seconds (Math.floor(Date.now() / 1000))
+  expiresAt: number;           // Unix epoch seconds
+}
+```
+
+### 3.2 Secret Management
+```typescript
+let devSecretWarningEmitted = false;
+
+export function getSessionSecret(): string {
+  const secret = process.env.SESSION_SECRET || process.env.AUTH_SECRET;
+
+  if (secret && secret.trim().length >= 32) {
+    return secret.trim();
+  }
+
+  if (process.env.NODE_ENV === "production") {
+    throw new Error(
+      "CRITICAL: SESSION_SECRET or AUTH_SECRET environment variable must be set with at least 32 characters in production."
+    );
+  }
+
+  if (!devSecretWarningEmitted) {
+    console.warn(
+      "[SECURITY WARNING] No valid SESSION_SECRET or AUTH_SECRET found (must be >= 32 characters). Falling back to development secret. DO NOT deploy this configuration to production!"
+    );
+    devSecretWarningEmitted = true;
+  }
+
+  return secret?.trim() || "dev-insecure-session-secret-at-least-32-chars-long-do-not-use-in-production";
+}
+```
+
+### 3.3 Token Serialization: `createSessionToken`
+```typescript
+export function createSessionToken(
+  user: { id?: string; userId?: string; email: string; fullName: string; role: "ADMIN" | "VOLUNTEER"; avatar?: string },
+  lifetimeSeconds: number = 604800
+): string {
+  const canonicalId = user.id || user.userId;
+  if (!canonicalId) {
+    throw new Error("createSessionToken: User must have an id or userId.");
+  }
+
+  const secret = getSessionSecret();
+  const nowSec = Math.floor(Date.now() / 1000);
+
+  const payload: SessionPayload = {
+    id: canonicalId,
+    userId: canonicalId,
+    email: user.email.trim().toLowerCase(),
+    role: user.role,
+    fullName: user.fullName,
+    avatar: user.avatar || user.fullName.slice(0, 2).toUpperCase(),
+    issuedAt: nowSec,
+    expiresAt: nowSec + lifetimeSeconds,
+  };
+
+  const payloadBase64Url = Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
+  const signatureHex = crypto
+    .createHmac("sha256", secret)
+    .update(payloadBase64Url)
+    .digest("hex");
+
+  return `${payloadBase64Url}.${signatureHex}`;
+}
+```
+
+### 3.4 Token Deserialization & Verification: `verifySessionToken` & `verifySessionTokenSync`
+```typescript
+export function verifySessionTokenSync(token: string | undefined | null): SessionPayload | null {
+  if (!token || typeof token !== "string") {
+    return null;
+  }
+
+  const parts = token.trim().split(".");
+  if (parts.length !== 2) {
+    return null;
+  }
+
+  const [payloadBase64Url, signatureHex] = parts;
+  if (!payloadBase64Url || !signatureHex) {
+    return null;
+  }
+
+  // HMAC-SHA256 hex digest is exactly 64 hex characters (32 bytes)
+  if (signatureHex.length !== 64 || !/^[0-9a-fA-F]{64}$/.test(signatureHex)) {
+    return null;
+  }
+
+  try {
+    const secret = getSessionSecret();
+    const expectedSigHex = crypto
+      .createHmac("sha256", secret)
+      .update(payloadBase64Url)
+      .digest("hex");
+
+    const sigBuf = Buffer.from(signatureHex, "hex");
+    const expSigBuf = Buffer.from(expectedSigHex, "hex");
+
+    // Timing-safe constant-time equality check
+    if (sigBuf.length !== expSigBuf.length || !crypto.timingSafeEqual(sigBuf, expSigBuf)) {
+      return null;
+    }
+
+    const jsonStr = Buffer.from(payloadBase64Url, "base64url").toString("utf8");
+    const payload = JSON.parse(jsonStr) as Partial<SessionPayload>;
+
+    const nowSec = Math.floor(Date.now() / 1000);
+
+    // Validate expiration in integer seconds
+    if (typeof payload.expiresAt !== "number" || nowSec > payload.expiresAt) {
+      return null;
+    }
+
+    // Sanity check future issuedAt (clock skew allowance 60s)
+    if (typeof payload.issuedAt !== "number" || payload.issuedAt > nowSec + 60) {
+      return null;
+    }
+
+    const canonicalId = payload.id || payload.userId;
+    if (!canonicalId || !payload.email || !payload.role || !payload.fullName) {
+      return null;
+    }
+
+    if (payload.role !== "ADMIN" && payload.role !== "VOLUNTEER") {
+      return null;
+    }
+
+    return {
+      id: canonicalId,
+      userId: canonicalId,
+      email: payload.email,
+      role: payload.role,
+      fullName: payload.fullName,
+      avatar: payload.avatar,
+      issuedAt: payload.issuedAt,
+      expiresAt: payload.expiresAt,
+    };
+  } catch {
+    return null;
+  }
+}
+
+export async function verifySessionToken(token: string | undefined | null): Promise<SessionPayload | null> {
+  return verifySessionTokenSync(token);
+}
+```
+
+### 3.5 AuthService Integration (`authenticate`, `getCurrentUser`, `logout`)
+```typescript
+export class AuthService {
+  // ... rate limiting & password verification ...
+
+  // Step 8 in authenticate():
+  const lifetimeSeconds = sessionUser.role === "VOLUNTEER" ? 86400 : 604800;
+  const token = createSessionToken(sessionUser, lifetimeSeconds);
+
+  const cookieStore = await cookies();
+  cookieStore.set(COOKIE_NAME, token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax",
+    path: "/",
+    maxAge: lifetimeSeconds,
+  });
+
+  return {
+    success: true,
+    user: sessionUser,
+  };
+
+  // getCurrentUser():
+  static async getCurrentUser(): Promise<UserAccount | null> {
+    try {
+      const cookieStore = await cookies();
+      const session = cookieStore.get(COOKIE_NAME);
+      if (!session || !session.value) return null;
+
+      const payload = await verifySessionToken(session.value);
+      if (!payload) return null;
+
+      return {
+        id: payload.id,
+        email: payload.email,
+        fullName: payload.fullName,
+        role: payload.role,
+        avatar: payload.avatar || payload.fullName.slice(0, 2).toUpperCase(),
+      };
+    } catch {
+      return null;
+    }
+  }
+
+  // logout():
+  static async logout(): Promise<void> {
+    try {
+      const cookieStore = await cookies();
+      cookieStore.delete(COOKIE_NAME);
+    } catch {
+      // Graceful fallback for non-request contexts
+    }
+  }
+}
+```
+
+### 3.6 Cross-Boundary Coordination with `src/proxy.ts`
+When signed tokens are activated, `src/proxy.ts` must parse the cookie through `verifySessionTokenSync` instead of `JSON.parse`.
+In `src/proxy.ts` (lines 16–25):
+```typescript
+import { verifySessionTokenSync } from "@/lib/services/authService";
+
+// Replace lines 16-25:
+const sessionCookie = request.cookies.get("event_auth_session")?.value;
+const userPayload = sessionCookie ? verifySessionTokenSync(sessionCookie) : null;
+const user = userPayload
+  ? {
+      id: userPayload.id,
+      email: userPayload.email,
+      role: userPayload.role,
+      fullName: userPayload.fullName,
+    }
+  : null;
+```
+This instantly hardens the middleware boundary and prevents unverified or tampered cookies from accessing protected routes.
+
+---
+
+## 4. Caveats
+
+1. **Active Cookie Invalidation on Upgrade:**
+   Transitioning from `JSON.stringify(user)` to signed tokens will cause existing unverified cookies stored in developer or tester browsers to return `null` on `verifySessionToken`. This is intended security behavior; affected users simply re-authenticate once to receive signed tokens.
+2. **Clock Synchronization:**
+   Session validation relies on integer Unix epoch seconds (`Math.floor(Date.now() / 1000)`). A 60-second clock skew tolerance is included for `issuedAt`. Servers must maintain NTP synchronization to prevent false expiration.
+3. **Dual Export (Sync and Async):**
+   `verifySessionToken` returns a `Promise<SessionPayload | null>` to adhere to standard Next.js async contracts, while `verifySessionTokenSync` provides a synchronous option for `src/proxy.ts` or fast testing loops. Both share the exact same underlying logic.
+
+---
+
+## 5. Conclusion
+
+1. Replacing raw JSON cookies with `<base64UrlPayload>.<hmacSignature>` HMAC-SHA256 signed session tokens completely eliminates the critical spoofing vulnerability in `event_auth_session`.
+2. Utilizing `crypto.timingSafeEqual` prevents timing side-channel attacks on signature verification.
+3. Defining `SessionPayload` with canonical `id` and `userId` aliases guarantees backwards compatibility across both server actions, server components, and API handlers.
+4. Enforcing integer epoch seconds for `issuedAt` and `expiresAt` with strict cookie flags (`httpOnly`, `secure`, `sameSite: "lax"`, `maxAge`) guarantees token lifecycle termination.
+5. Preserving `<Suspense>` boundaries around dynamic `AuthService.getCurrentUser()` call sites ensures 100% compatibility with Next.js 16 Partial Prerendering and Cache Components.
+
+---
+
+## 6. Verification Method
+
+### 6.1 Typecheck Verification
+Execute TypeScript compilation check:
+```powershell
+npx.cmd tsc --noEmit
+```
+Expected output: 0 errors.
+
+### 6.2 Next.js Build Verification
+Execute full production build with cache components and partial prefetching:
+```powershell
+npm.cmd run build
+```
+Expected output: 0 errors, successful static/partial prerender page generation.
+
+### 6.3 Functional & Cryptographic Unit Tests
+Create unit tests (in `tests/auth_session.test.ts` or executable script) to verify:
+1. **Valid Token Generation & Verification:**
+   Generate token via `createSessionToken(adminUser)` -> pass to `verifySessionToken(token)` -> returns matching `SessionPayload`.
+2. **Tamper Rejection:**
+   Alter 1 character in `base64UrlPayload` -> `verifySessionToken(tamperedToken)` returns `null`.
+   Alter 1 character in `signatureHex` -> `verifySessionToken(tamperedToken)` returns `null`.
+3. **Expiration Rejection:**
+   Create token with `lifetimeSeconds = -10` -> `verifySessionToken(expiredToken)` returns `null`.
+4. **Secret Retrieval Fallback:**
+   With `SESSION_SECRET` and `AUTH_SECRET` undefined, verify development warning is logged and token still generates and verifies consistently.
+5. **Cookie Flags Inspection:**
+   Verify cookie options passed to `cookieStore.set` contain `httpOnly: true`, `sameSite: "lax"`, `path: "/"`, `maxAge`.

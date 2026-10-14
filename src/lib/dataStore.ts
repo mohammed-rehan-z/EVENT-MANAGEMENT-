@@ -62,7 +62,7 @@ export interface EventData {
 
 export interface AuditLog {
   id: string;
-  event_id: string;
+  event_id: string | null;
   timestamp: string;
   action:
     | "CHECK_IN_SUCCESS"
@@ -85,7 +85,15 @@ export interface AuditLog {
     | "BULK_EXPIRATION_EXTEND"
     | "BULK_QR_BATCH"
     | "TEAM_CREATED"
-    | "TEAM_DELETED";
+    | "TEAM_DELETED"
+    | "AUTH_LOGIN_SUCCESS"
+    | "AUTH_LOGIN_FAILURE"
+    | "AUTH_LOCKOUT"
+    | "LOGIN_SUCCESS"
+    | "LOGIN_FAILED_ATTEMPT"
+    | "LOGIN_ACCOUNT_LOCKED"
+    | "USER_CREATED"
+    | "USER_UPDATED";
   severity: "INFO" | "WARNING" | "CRITICAL";
   actor_id: string;
   actor_role: "ADMIN" | "VOLUNTEER" | "SYSTEM";
@@ -93,13 +101,82 @@ export interface AuditLog {
   target_name?: string;
   ip_address?: string;
   user_agent?: string;
-  details: Record<string, any>;
+  details: Record<string, unknown>;
+}
+
+export interface UserAccount {
+  id: string;
+  email: string;
+  fullName?: string;
+  full_name?: string;
+  role: "ADMIN" | "VOLUNTEER";
+  avatar?: string;
+  password_hash?: string;
+  password_salt?: string;
+  salt?: string;
+}
+
+export interface UserRecord {
+  id: string;
+  email: string;
+  password_hash: string;
+  salt: string;
+  password_salt: string;
+  full_name: string;
+  role: "ADMIN" | "VOLUNTEER";
+  avatar: string;
+  failed_attempts: number;
+  locked_until?: string | null;
+  created_at: string;
+}
+
+export type SafeUserRecord = Omit<UserRecord, "password_hash" | "salt" | "password_salt">;
+
+export function sanitizeUser<T extends Partial<UserRecord>>(user: T): Omit<T, "password_hash" | "salt" | "password_salt"> {
+  const { password_hash, salt, password_salt, ...safe } = user;
+  return safe;
+}
+
+export const DEFAULT_USERS: UserRecord[] = [
+  {
+    id: "usr-admin-1",
+    email: "admin@eventportal.com",
+    // Precomputed PBKDF2 HMAC-SHA512 (100,000 rounds, 64-byte key) with 32-byte salt (64 hex characters)
+    password_hash: "680e3a63563829fcdf3cd860008179a1b3b947f3109dc6650b752f4c6fc8d5fd61abc88bbffcf100a53113f6fea5d18dab468c39b60751261b3058b42fea33de",
+    salt: "db1bbed31405ba049ce315e40a8e265b4031ac90772c4fa5bc0e5f8bfa3db0ab",
+    password_salt: "db1bbed31405ba049ce315e40a8e265b4031ac90772c4fa5bc0e5f8bfa3db0ab",
+    full_name: "Alex Mercer",
+    role: "ADMIN",
+    avatar: "AM",
+    failed_attempts: 0,
+    locked_until: null,
+    created_at: "2026-10-15T00:00:00.000Z",
+  },
+  {
+    id: "usr-volunteer-1",
+    email: "volunteer@eventportal.com",
+    // Precomputed PBKDF2 HMAC-SHA512 (100,000 rounds, 64-byte key) with 32-byte salt (64 hex characters)
+    password_hash: "c10177b0231ed145ca2935cd240a035f916e5192f2caf9ec71fbec2db011a7ccd9128342eafa1fef455da161d63057a83bb2870ce2b112c7f312b6e6d935a6a5",
+    salt: "7956d5345e097592224035319f4860d392670f9fb43b8108ea2de0120664ef09",
+    password_salt: "7956d5345e097592224035319f4860d392670f9fb43b8108ea2de0120664ef09",
+    full_name: "Jordan Lee",
+    role: "VOLUNTEER",
+    avatar: "JL",
+    failed_attempts: 0,
+    locked_until: null,
+    created_at: "2026-10-15T00:00:00.000Z",
+  },
+];
+
+function getInitialUsers(): UserRecord[] {
+  return JSON.parse(JSON.stringify(DEFAULT_USERS));
 }
 
 interface LocalStoreSchema {
   events: EventData[];
   teams: Team[];
   audit_logs: AuditLog[];
+  users?: UserRecord[];
 }
 
 const DATA_DIR = path.join(process.cwd(), "data");
@@ -114,6 +191,7 @@ function getLocalData(): LocalStoreSchema {
     if (!fs.existsSync(DATA_FILE)) {
       const initialExpires = new Date(Date.now() + 48 * 3600 * 1000).toISOString();
       const initialData: LocalStoreSchema = {
+        users: getInitialUsers(),
         events: [
           {
             id: "ev-1",
@@ -257,10 +335,29 @@ function getLocalData(): LocalStoreSchema {
     if (!parsed.audit_logs) {
       parsed.audit_logs = [];
     }
+    if (!parsed.users || !Array.isArray(parsed.users) || parsed.users.length === 0) {
+      parsed.users = getInitialUsers();
+      saveLocalData(parsed);
+    } else {
+      let migrated = false;
+      for (let i = 0; i < parsed.users.length; i++) {
+        const u = parsed.users[i];
+        if (u.id === "usr-admin-1" && (!u.salt || u.salt.length !== 64 || !u.password_salt)) {
+          parsed.users[i] = { ...u, ...DEFAULT_USERS[0] };
+          migrated = true;
+        } else if (u.id === "usr-volunteer-1" && (!u.salt || u.salt.length !== 64 || !u.password_salt)) {
+          parsed.users[i] = { ...u, ...DEFAULT_USERS[1] };
+          migrated = true;
+        }
+      }
+      if (migrated) {
+        saveLocalData(parsed);
+      }
+    }
     return parsed;
   } catch (err) {
     console.error("Local data read error:", err);
-    return { events: [], teams: [], audit_logs: [] };
+    return { events: [], teams: [], audit_logs: [], users: getInitialUsers() };
   }
 }
 
@@ -342,7 +439,7 @@ export async function logSecurityAuditAction(
           },
         },
       ]);
-    } catch (e) {
+    } catch {
       // Non-blocking fallback
     }
   }
@@ -1541,3 +1638,192 @@ export async function bulkDeleteTeamsInStore(teamIds: string[]): Promise<{
     message: `Successfully deleted ${deletedCount} teams from the database.`,
   };
 }
+
+/**
+ * Returns all active user accounts from the database with sensitive credentials stripped
+ */
+export async function getDbUsers(): Promise<SafeUserRecord[]> {
+  const store = getLocalData();
+  return (store.users || []).map(sanitizeUser);
+}
+
+/**
+ * Looks up a user account by email in Supabase and the local store
+ */
+export async function getDbUserByEmail(email: string): Promise<UserRecord | null> {
+  const cleanEmail = email.trim().toLowerCase();
+
+  // 1. Check Supabase users table if live
+  if (isSupabaseLive()) {
+    try {
+      const { data, error } = await supabase
+        .from("users")
+        .select("*")
+        .eq("email", cleanEmail)
+        .maybeSingle();
+
+      if (!error && data) {
+        const u = data as UserRecord;
+        return {
+          ...u,
+          password_salt: u.password_salt || u.salt,
+        };
+      }
+    } catch {
+      // Fall through to store
+    }
+  }
+
+  // 2. Query persistent database store
+  const store = getLocalData();
+  const found = (store.users || []).find(
+    (u) => u.email.toLowerCase() === cleanEmail
+  );
+  if (!found) return null;
+  return {
+    ...found,
+    password_salt: found.password_salt || found.salt,
+  };
+}
+
+/**
+ * Updates a user account in the database (local and Supabase sync)
+ */
+export async function updateDbUser(updatedUser: UserRecord): Promise<void> {
+  const store = getLocalData();
+  if (!store.users) {
+    store.users = getInitialUsers();
+  }
+  const idx = store.users.findIndex(
+    (u) => u.id === updatedUser.id || u.email.toLowerCase() === updatedUser.email.toLowerCase()
+  );
+  if (idx >= 0) {
+    store.users[idx] = updatedUser;
+  } else {
+    store.users.push(updatedUser);
+  }
+  saveLocalData(store);
+
+  // Sync with Supabase
+  if (isSupabaseLive()) {
+    try {
+      await supabase.from("users").upsert([
+        {
+          id: updatedUser.id,
+          email: updatedUser.email,
+          password_hash: updatedUser.password_hash,
+          salt: updatedUser.salt,
+          password_salt: updatedUser.password_salt || updatedUser.salt,
+          full_name: updatedUser.full_name,
+          role: updatedUser.role,
+          avatar: updatedUser.avatar,
+          failed_attempts: updatedUser.failed_attempts,
+          locked_until: updatedUser.locked_until,
+        },
+      ]);
+    } catch {
+      // Non-blocking fallback
+    }
+  }
+}
+
+/**
+ * Records a failed login attempt with brute-force lockout defense
+ */
+export async function recordFailedLoginAttempt(
+  email: string,
+  ipAddress?: string
+): Promise<{ locked: boolean; lockedUntil?: string; attemptsLeft: number }> {
+  const cleanEmail = email.trim().toLowerCase();
+  const user = await getDbUserByEmail(cleanEmail);
+
+  if (!user) {
+    // Log invalid attempt against non-existent account for audit tracking
+    await logSecurityAuditAction({
+      event_id: null,
+      action: "AUTH_LOGIN_FAILURE",
+      severity: "WARNING",
+      actor_id: "anonymous",
+      actor_role: "SYSTEM",
+      target_id: "unknown",
+      target_name: cleanEmail,
+      ip_address: ipAddress || "unknown",
+      details: {
+        email: cleanEmail,
+        reason: "User account does not exist.",
+      },
+    });
+    return { locked: false, attemptsLeft: 0 };
+  }
+
+  const currentAttempts = (user.failed_attempts || 0) + 1;
+  const MAX_ATTEMPTS = 5;
+  const LOCKOUT_MINUTES = 15;
+
+  let locked = false;
+  let lockedUntil: string | null = null;
+
+  if (currentAttempts >= MAX_ATTEMPTS) {
+    locked = true;
+    lockedUntil = new Date(Date.now() + LOCKOUT_MINUTES * 60 * 1000).toISOString();
+    user.locked_until = lockedUntil;
+    user.failed_attempts = currentAttempts;
+
+    await logSecurityAuditAction({
+      event_id: null,
+      action: "AUTH_LOCKOUT",
+      severity: "CRITICAL",
+      actor_id: user.id,
+      actor_role: user.role,
+      target_id: user.id,
+      target_name: user.full_name,
+      ip_address: ipAddress || "unknown",
+      details: {
+        email: cleanEmail,
+        failed_attempts: currentAttempts,
+        locked_until: lockedUntil,
+        reason: `Exceeded ${MAX_ATTEMPTS} consecutive failed authentication attempts. Account locked for ${LOCKOUT_MINUTES}m.`,
+      },
+    });
+  } else {
+    user.failed_attempts = currentAttempts;
+
+    await logSecurityAuditAction({
+      event_id: null,
+      action: "AUTH_LOGIN_FAILURE",
+      severity: "WARNING",
+      actor_id: user.id,
+      actor_role: user.role,
+      target_id: user.id,
+      target_name: user.full_name,
+      ip_address: ipAddress || "unknown",
+      details: {
+        email: cleanEmail,
+        attempt: currentAttempts,
+        attemptsLeft: MAX_ATTEMPTS - currentAttempts,
+      },
+    });
+  }
+
+  await updateDbUser(user);
+
+  return {
+    locked,
+    lockedUntil: lockedUntil || undefined,
+    attemptsLeft: Math.max(0, MAX_ATTEMPTS - currentAttempts),
+  };
+}
+
+/**
+ * Resets failed login counters upon successful authentication
+ */
+export async function resetFailedLoginAttempts(email: string): Promise<void> {
+  const cleanEmail = email.trim().toLowerCase();
+  const user = await getDbUserByEmail(cleanEmail);
+  if (user && (user.failed_attempts > 0 || user.locked_until)) {
+    user.failed_attempts = 0;
+    user.locked_until = null;
+    await updateDbUser(user);
+  }
+}
+

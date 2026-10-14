@@ -116,11 +116,19 @@ export default function EventsSelectionPage() {
         getSessionUserAction(),
       ]);
 
+      if (!userRes) {
+        router.replace("/");
+        return;
+      }
+      if (userRes.role !== "ADMIN") {
+        router.replace("/scan");
+        return;
+      }
+
+      setUser(userRes);
+
       if (eventsRes.success) {
         setEvents(eventsRes.events);
-      }
-      if (userRes) {
-        setUser(userRes);
       }
     } catch (err: any) {
       toast.error("Error loading events: " + err.message);
