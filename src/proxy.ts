@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import { verifySessionTokenSync } from "@/lib/services/sessionService";
 
 export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -14,15 +15,7 @@ export function proxy(request: NextRequest) {
   }
 
   const sessionCookie = request.cookies.get("event_auth_session")?.value;
-  let user: { id: string; email: string; role: string; fullName: string } | null = null;
-
-  if (sessionCookie) {
-    try {
-      user = JSON.parse(sessionCookie);
-    } catch {
-      user = null;
-    }
-  }
+  const user = sessionCookie ? verifySessionTokenSync(sessionCookie) : null;
 
   // 1. Auth Page ("/") is always open and accessible
   if (pathname === "/") {

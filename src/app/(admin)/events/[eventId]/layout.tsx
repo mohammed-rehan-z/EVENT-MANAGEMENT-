@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 import {
   LayoutDashboard,
   Users,
@@ -20,6 +21,7 @@ async function AdminSidebar({
 }: {
   params: Promise<{ eventId: string }>;
 }) {
+  await connection();
   const resolvedParams = await params;
   const eventId = resolvedParams.eventId || "ev-1";
 
@@ -193,6 +195,7 @@ async function AdminHeader({
 }: {
   params: Promise<{ eventId: string }>;
 }) {
+  await connection();
   const resolvedParams = await params;
   const eventId = resolvedParams.eventId || "ev-1";
 
@@ -267,6 +270,7 @@ function AdminHeaderSkeleton() {
 }
 
 async function AdminMobileNav({ params }: { params: Promise<{ eventId: string }> }) {
+  await connection();
   const resolved = await params;
   const eventId = resolved.eventId || "ev-1";
 

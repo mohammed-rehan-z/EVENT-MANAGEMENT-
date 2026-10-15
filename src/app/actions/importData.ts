@@ -251,28 +251,38 @@ export async function processRegistrationImport(
       };
     }
 
-    // 2. Save each team into our dataStore with its OWN unique QR token and QR image
+    // 2. Save teams into dataStore: preserves active QR passes for existing teams, generates new QRs only for new teams
     const result = await saveImportedTeams(eventId, processedTeams);
 
-    // 3. If Supabase is connected, sync each separate team and its participants to Supabase
+    // 3. If Supabase is connected, sync only new teams and their participants to Supabase
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
     if (supabaseUrl && !supabaseUrl.includes("placeholder")) {
       try {
         for (const team of processedTeams) {
-          const { data: insertedTeam } = await supabase
+          // Check if team already exists in Supabase
+          const { data: existingSbTeam } = await supabase
             .from("teams")
-            .insert([{ event_id: eventId, name: team.name, normalized_name: team.normalized_name, status: "APPROVED" }])
-            .select()
-            .single();
+            .select("id")
+            .eq("event_id", eventId)
+            .eq("normalized_name", team.normalized_name)
+            .maybeSingle();
 
-          if (insertedTeam) {
-            const participantsToInsert = team.participants.map((p, idx) => ({
-              ...p,
-              team_id: insertedTeam.id,
-              event_id: eventId,
-              is_leader: idx === 0,
-            }));
-            await supabase.from("participants").insert(participantsToInsert);
+          if (!existingSbTeam) {
+            const { data: insertedTeam } = await supabase
+              .from("teams")
+              .insert([{ event_id: eventId, name: team.name, normalized_name: team.normalized_name, status: "APPROVED" }])
+              .select()
+              .single();
+
+            if (insertedTeam) {
+              const participantsToInsert = team.participants.map((p, idx) => ({
+                ...p,
+                team_id: insertedTeam.id,
+                event_id: eventId,
+                is_leader: idx === 0,
+              }));
+              await supabase.from("participants").insert(participantsToInsert);
+            }
           }
         }
       } catch (sbErr) {
@@ -282,11 +292,24 @@ export async function processRegistrationImport(
 
     const totalParticipants = processedTeams.reduce((sum, t) => sum + t.participants.length, 0);
 
+    let feedbackMessage = "";
+    if (result.added > 0 && result.existingRetained > 0) {
+      feedbackMessage = `Processed ${processedTeams.length} teams (${totalParticipants} participants). Generated new QR passes for ${result.added} new teams; preserved existing QR passes for ${result.existingRetained} existing teams awaiting gate verification.`;
+    } else if (result.existingRetained > 0 && result.added === 0) {
+      feedbackMessage = `Processed ${processedTeams.length} teams. All ${result.existingRetained} teams are already registered with active QR passes (verification pending). Existing QR codes were preserved without regeneration.`;
+    } else {
+      feedbackMessage = `Successfully registered ${result.added} new teams (${totalParticipants} participants) with distinct secure QR passes generated.`;
+    }
+
     return {
       success: true,
-      message: `Successfully segregated into ${processedTeams.length} separate teams (${totalParticipants} participants). Generated a separate QR code for each team!`,
+      message: feedbackMessage,
       teamsCount: processedTeams.length,
       participantsCount: totalParticipants,
+      addedCount: result.added,
+      updatedCount: result.updated,
+      existingRetainedCount: result.existingRetained,
+      newGeneratedCount: result.newGenerated,
       teamsSummary: processedTeams.map((t) => ({
         name: t.name,
         membersCount: t.participants.length,

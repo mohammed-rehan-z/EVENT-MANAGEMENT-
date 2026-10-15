@@ -180,9 +180,10 @@ function ImportsContent() {
           skipEmptyLines: true,
           complete: (results) => {
             if (results.data && results.data.length > 0) {
-              setPreviewData(results.data);
-              autoDetectTeamColumn(results.data);
-              toast.success(`Successfully parsed ${results.data.length} rows.`);
+              const cleanData = JSON.parse(JSON.stringify(results.data));
+              setPreviewData(cleanData);
+              autoDetectTeamColumn(cleanData);
+              toast.success(`Successfully parsed ${cleanData.length} rows.`);
             } else {
               toast.error("The file appears to be empty.");
             }
@@ -199,11 +200,13 @@ function ImportsContent() {
         const workbook = XLSX.read(arrayBuffer, { type: "array" });
         const firstSheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[firstSheetName];
-        const parsedData: any[] = XLSX.utils.sheet_to_json(worksheet);
-        if (parsedData && parsedData.length > 0) {
-          setPreviewData(parsedData);
-          autoDetectTeamColumn(parsedData);
-          toast.success(`Successfully parsed ${parsedData.length} records from Excel.`);
+        const rawParsed: any[] = XLSX.utils.sheet_to_json(worksheet, { defval: "" });
+        // Deep-clean into 100% plain objects so React Server Action boundaries serialize without errors
+        const cleanData: any[] = JSON.parse(JSON.stringify(rawParsed));
+        if (cleanData && cleanData.length > 0) {
+          setPreviewData(cleanData);
+          autoDetectTeamColumn(cleanData);
+          toast.success(`Successfully parsed ${cleanData.length} records from Excel.`);
         } else {
           toast.error("No data rows found in Excel sheet.");
         }
@@ -235,7 +238,9 @@ function ImportsContent() {
 
     setIsUploading(true);
     try {
-      const response = await processRegistrationImport(eventId, previewData, selectedTeamColumn);
+      // Ensure strictly plain serializable objects are passed across the Server Action boundary
+      const cleanPayload = JSON.parse(JSON.stringify(previewData));
+      const response = await processRegistrationImport(eventId, cleanPayload, selectedTeamColumn);
 
       if (response.success) {
         toast.success(response.message, { duration: 4000 });

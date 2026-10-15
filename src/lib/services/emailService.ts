@@ -1,4 +1,5 @@
 import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
 export interface SendTeamPassEmailParams {
   to: string;
@@ -23,6 +24,29 @@ export interface SendVenueOtpEmailParams {
 }
 
 export class EmailService {
+  private static getSmtpTransporter() {
+    const host = process.env.SMTP_HOST || "smtp.gmail.com";
+    const user = process.env.SMTP_USER;
+    const pass = process.env.SMTP_PASS;
+
+    if (!user || !pass || user.trim() === "" || pass.trim() === "") {
+      return null;
+    }
+
+    const port = Number(process.env.SMTP_PORT) || 465;
+    const isSecure = port === 465 || process.env.SMTP_SECURE === "true";
+
+    return nodemailer.createTransport({
+      host,
+      port,
+      secure: isSecure,
+      auth: {
+        user: user.trim(),
+        pass: pass.trim().replace(/\s+/g, ""),
+      },
+    });
+  }
+
   private static getResendClient(): Resend | null {
     const apiKey = process.env.RESEND_API_KEY;
     if (!apiKey || apiKey.trim() === "" || apiKey.includes("placeholder")) {
@@ -32,7 +56,12 @@ export class EmailService {
   }
 
   private static getFromAddress(): string {
-    return process.env.RESEND_FROM_EMAIL || "Event Portal <onboarding@resend.dev>";
+    return (
+      process.env.SMTP_FROM ||
+      (process.env.SMTP_USER ? `HKBK Event Portal <${process.env.SMTP_USER.trim()}>` : undefined) ||
+      process.env.RESEND_FROM_EMAIL ||
+      "Event Portal <onboarding@resend.dev>"
+    );
   }
 
   /**
@@ -109,6 +138,17 @@ export class EmailService {
           <p>Below is your official single-use cryptographic QR pass. Please present this digital QR code at the venue entry gate along with valid ID cards for all team members.</p>
         `;
 
+    const smtpTransporter = this.getSmtpTransporter();
+    
+    // QuickChart Cloudflare CDN endpoint: ultra-compatible with Google Image Proxy & mobile mail clients
+    const encodedToken = encodeURIComponent(qrToken);
+    const qrImgSrc = qrToken
+      ? `https://quickchart.io/qr?size=250&text=${encodedToken}`
+      : qrDataUrl || "https://quickchart.io/qr?size=250&text=PASS";
+    const downloadPassUrl = qrToken
+      ? `https://quickchart.io/qr?size=600&text=${encodedToken}`
+      : "#";
+
     const htmlContent = `
       <!DOCTYPE html>
       <html>
@@ -120,11 +160,11 @@ export class EmailService {
             .header { background: #0f172a; padding: 28px 24px; text-align: center; color: #ffffff; }
             .content { padding: 28px 24px; line-height: 1.6; }
             .badge { display: inline-block; background: #3b82f6; color: #ffffff; font-size: 11px; font-weight: 700; text-transform: uppercase; padding: 4px 12px; border-radius: 9999px; letter-spacing: 0.05em; margin-bottom: 12px; }
-            .qr-box { text-align: center; background: #f1f5f9; padding: 24px; border-radius: 12px; margin: 20px 0; border: 1px dashed #cbd5e1; }
-            .qr-img { max-width: 240px; height: auto; border-radius: 8px; background: #ffffff; padding: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+            .qr-box { text-align: center; background: #f8fafc; padding: 24px; border-radius: 12px; margin: 20px 0; border: 1px solid #e2e8f0; }
+            .qr-img { width: 220px; height: 220px; border-radius: 10px; background: #ffffff; padding: 10px; border: 1px solid #cbd5e1; display: block; margin: 0 auto; }
             .meta-box { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 14px; margin: 16px 0; font-size: 13px; }
             .footer { background: #f8fafc; border-top: 1px solid #e2e8f0; padding: 18px 24px; text-align: center; font-size: 12px; color: #64748b; }
-            .token { font-family: ui-monospace, Menlo, Monaco, Consolas, monospace; font-size: 12px; color: #475569; word-break: break-all; margin-top: 8px; }
+            .token { font-family: ui-monospace, Menlo, Monaco, Consolas, monospace; font-size: 12px; color: #475569; word-break: break-all; margin-top: 12px; }
           </style>
         </head>
         <body>
@@ -140,12 +180,13 @@ export class EmailService {
               </div>
 
               <div class="qr-box">
-                ${
-                  qrDataUrl
-                    ? `<img src="${qrDataUrl}" alt="Team QR Pass" class="qr-img" />`
-                    : `<div style="padding: 30px; color: #64748b;">[Digital QR Pass Attached]</div>`
-                }
-                <div class="token">Token ID: ${qrToken || "CRYPTOGRAPHIC-PASS"}</div>
+                <img src="${qrImgSrc}" alt="Entry QR Pass" width="220" height="220" class="qr-img" style="width: 220px; height: 220px; border-radius: 10px; background: #ffffff; padding: 10px; border: 1px solid #cbd5e1; display: block; margin: 0 auto;" />
+                <div style="margin-top: 14px;">
+                  <a href="${downloadPassUrl}" target="_blank" style="display: inline-block; background: #2563eb; color: #ffffff; text-decoration: none; font-size: 13px; font-weight: 600; padding: 8px 18px; border-radius: 8px;">
+                    📱 View &amp; Save QR Pass
+                  </a>
+                </div>
+                <div class="token"><strong>Token:</strong> ${qrToken || "CRYPTOGRAPHIC-PASS"}</div>
               </div>
 
               <div class="meta-box">
@@ -167,9 +208,14 @@ export class EmailService {
       </html>
     `;
 
-    // Prepare attachments if requested
-    const attachments: Array<{ filename: string; content: Buffer }> = [];
-    if (includeAttachment && qrDataUrl.startsWith("data:image/")) {
+    // High-resolution attached PNG pass file
+    const attachments: Array<{
+      filename: string;
+      content: Buffer;
+      contentType?: string;
+    }> = [];
+
+    if (qrDataUrl && qrDataUrl.startsWith("data:image/")) {
       try {
         const base64Data = qrDataUrl.split(";base64,").pop();
         if (base64Data) {
@@ -178,10 +224,42 @@ export class EmailService {
           attachments.push({
             filename: `${safeName}_Entry_Pass.png`,
             content: buffer,
+            contentType: "image/png",
           });
         }
       } catch (err) {
         console.warn("Could not generate attachment buffer from QR data URL:", err);
+      }
+    }
+
+    // 1. Prioritize Gmail SMTP if configured
+    if (smtpTransporter) {
+      try {
+        const fromAddress = this.getFromAddress();
+        const info: any = await smtpTransporter.sendMail({
+          from: fromAddress,
+          to,
+          subject,
+          html: htmlContent,
+          attachments: (attachments.length > 0 ? (attachments as any) : undefined),
+        });
+
+        console.log(`[SMTP SUCCESS] QR Pass delivered to ${to} via Gmail SMTP (Message ID: ${info?.messageId || "ok"})`);
+        return {
+          success: true,
+          emailId: info?.messageId,
+          isSimulated: false,
+          message: `Official QR pass delivered to ${to} via Gmail.`,
+        };
+      } catch (smtpErr: any) {
+        console.error("Gmail SMTP delivery error:", smtpErr);
+        if (!this.getResendClient()) {
+          return {
+            success: false,
+            isSimulated: false,
+            message: `Gmail SMTP error: ${smtpErr.message || "Failed to dispatch email via Gmail"}`,
+          };
+        }
       }
     }
 
@@ -194,17 +272,25 @@ export class EmailService {
       return {
         success: true,
         isSimulated: true,
-        message: `Pass dispatched to ${to} (Simulated mode: set RESEND_API_KEY in .env.local for production delivery).`,
+        message: `Pass dispatched to ${to} (Simulated mode: set SMTP credentials or RESEND_API_KEY in .env.local).`,
       };
     }
 
     try {
+      const resendAttachments =
+        attachments.length > 0
+          ? attachments.map((att, i) => ({
+              filename: typeof att.filename === "string" ? att.filename : `qr-pass-${i + 1}.png`,
+              content: att.content,
+            }))
+          : undefined;
+
       const response = await resend.emails.send({
         from: this.getFromAddress(),
         to: [to],
         subject,
         html: htmlContent,
-        attachments: attachments.length > 0 ? attachments : undefined,
+        attachments: resendAttachments,
       });
 
       if (response.error) {
@@ -290,6 +376,37 @@ export class EmailService {
         </body>
       </html>
     `;
+
+    // 1. Prioritize Gmail SMTP if configured
+    const smtp = this.getSmtpTransporter();
+    if (smtp) {
+      try {
+        const fromAddress = this.getFromAddress();
+        const info = await smtp.sendMail({
+          from: fromAddress,
+          to,
+          subject,
+          html: htmlContent,
+        });
+
+        console.log(`[SMTP SUCCESS] Venue OTP delivered to ${to} via Gmail SMTP (Message ID: ${info.messageId})`);
+        return {
+          success: true,
+          emailId: info.messageId,
+          isSimulated: false,
+          message: `Verification code dispatched to ${to} via Gmail.`,
+        };
+      } catch (smtpErr: any) {
+        console.error("Gmail SMTP OTP error:", smtpErr);
+        if (!this.getResendClient()) {
+          return {
+            success: false,
+            isSimulated: false,
+            message: `Gmail SMTP OTP error: ${smtpErr.message || "Failed to dispatch OTP via Gmail"}`,
+          };
+        }
+      }
+    }
 
     const resend = this.getResendClient();
 

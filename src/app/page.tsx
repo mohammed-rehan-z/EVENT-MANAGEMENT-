@@ -214,6 +214,8 @@ function LoginForm() {
             </Button>
           </form>
 
+
+
           <div className="pt-2 text-center">
             <div className="inline-flex items-center gap-1.5 text-[11px] text-slate-500 font-medium bg-slate-50 border border-slate-100 rounded-full px-3 py-1">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />

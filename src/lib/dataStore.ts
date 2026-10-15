@@ -153,6 +153,62 @@ export const DEFAULT_USERS: UserRecord[] = [
     created_at: "2026-10-15T00:00:00.000Z",
   },
   {
+    id: "usr-admin-2",
+    email: "mohammedrehanz517@gmail.com",
+    // Password: rehan@2026
+    password_hash: "f5a22160eb4cf067fa918b1a76905e4a14892d0df0377474a47815e2b0df543745003bd68c634b2992084ac2a9da69c4241bb8717a546b951787c2eb6f066fd3",
+    salt: "479bc3075825c1ba4fc67faf0037336852aa1797555592be67451cf72b0495f3",
+    password_salt: "479bc3075825c1ba4fc67faf0037336852aa1797555592be67451cf72b0495f3",
+    full_name: "Mohammed Rehan Z",
+    role: "ADMIN",
+    avatar: "MR",
+    failed_attempts: 0,
+    locked_until: null,
+    created_at: "2026-10-15T00:00:00.000Z",
+  },
+  {
+    id: "usr-volunteer-2",
+    email: "volunteer@gmail.com",
+    // Password: volunteer@123
+    password_hash: "a0941a6cd2590a23170326555da239b31ea3a662d161a37435cf58712727009fc891f62fcbe9b21dbe6263f4a534babef783e0217332badad1ace6993950c05d",
+    salt: "7908dfcf5ed87fc361e4b594856adf74eca30e0c5b7f30b3c0dbe4c256b8468e",
+    password_salt: "7908dfcf5ed87fc361e4b594856adf74eca30e0c5b7f30b3c0dbe4c256b8468e",
+    full_name: "Volunteer",
+    role: "VOLUNTEER",
+    avatar: "VO",
+    failed_attempts: 0,
+    locked_until: null,
+    created_at: "2026-10-15T00:00:00.000Z",
+  },
+  {
+    id: "usr-admin-4",
+    email: "hanzala.jawwad@gmail.com",
+    // Password: hanzala@2026
+    password_hash: "483137ed5265aa4ed408d783fa3d1a09251b1477bc18ff1b653a36b20b722c4cace68a12c2db7fd67c869330d793e46b037c1b0d6889641f39a83660f71dad51",
+    salt: "c892a1e43d305cdc56f76f24f9c394be5b22d9917e817efa8034a080874c72b7",
+    password_salt: "c892a1e43d305cdc56f76f24f9c394be5b22d9917e817efa8034a080874c72b7",
+    full_name: "Hanzala",
+    role: "ADMIN",
+    avatar: "HJ",
+    failed_attempts: 0,
+    locked_until: null,
+    created_at: "2026-10-15T00:00:00.000Z",
+  },
+  {
+    id: "usr-admin-5",
+    email: "faculty@gmail.com",
+    // Password: faculty@2026
+    password_hash: "d1b905cdd517587bc4a601e576c57eed70ece80d7eb45b56724d50e7428dc8b05111b69fa5a851cc28411c89aa71e2779609d33d89d0086b92325cffcd14db2a",
+    salt: "60342ac8840216f6e74fbfad5158349492aba19e1b1e976fa41bd1e57fe17dc1",
+    password_salt: "60342ac8840216f6e74fbfad5158349492aba19e1b1e976fa41bd1e57fe17dc1",
+    full_name: "Faculty Coordinator",
+    role: "ADMIN",
+    avatar: "FC",
+    failed_attempts: 0,
+    locked_until: null,
+    created_at: "2026-10-15T00:00:00.000Z",
+  },
+  {
     id: "usr-volunteer-1",
     email: "volunteer@eventportal.com",
     // Precomputed PBKDF2 HMAC-SHA512 (100,000 rounds, 64-byte key) with 32-byte salt (64 hex characters)
@@ -162,6 +218,20 @@ export const DEFAULT_USERS: UserRecord[] = [
     full_name: "Jordan Lee",
     role: "VOLUNTEER",
     avatar: "JL",
+    failed_attempts: 0,
+    locked_until: null,
+    created_at: "2026-10-15T00:00:00.000Z",
+  },
+  {
+    id: "usr-admin-3",
+    email: "1hk23ai034@hkbk.edu.in",
+    // Password: admin123
+    password_hash: "680e3a63563829fcdf3cd860008179a1b3b947f3109dc6650b752f4c6fc8d5fd61abc88bbffcf100a53113f6fea5d18dab468c39b60751261b3058b42fea33de",
+    salt: "db1bbed31405ba049ce315e40a8e265b4031ac90772c4fa5bc0e5f8bfa3db0ab",
+    password_salt: "db1bbed31405ba049ce315e40a8e265b4031ac90772c4fa5bc0e5f8bfa3db0ab",
+    full_name: "Rehan Z",
+    role: "ADMIN",
+    avatar: "RZ",
     failed_attempts: 0,
     locked_until: null,
     created_at: "2026-10-15T00:00:00.000Z",
@@ -189,143 +259,11 @@ function getLocalData(): LocalStoreSchema {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
     if (!fs.existsSync(DATA_FILE)) {
-      const initialExpires = new Date(Date.now() + 48 * 3600 * 1000).toISOString();
       const initialData: LocalStoreSchema = {
         users: getInitialUsers(),
-        events: [
-          {
-            id: "ev-1",
-            name: "Apex Cyber League 2026",
-            description: "National Collegiate Inter-College E-Sports & Hackathon Championship",
-            overview: "Apex Cyber League 2026 is the premier collegiate inter-college e-sports & hackathon championship bringing together top developers, strategists, and cybersecurity innovators. Featuring 48-hour continuous hack tracks, high-stakes Valorant & Rocket League brackets, and keynote panels with tech industry pioneers.",
-            venue: "Grand Convention Arena, Hall 4",
-            date: "2026-10-15T09:00:00Z",
-            end_date: "2026-10-18T18:00:00Z",
-            thumbnail_url: "https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=1200&q=80",
-            is_active: true,
-          },
-        ],
-        teams: [
-          {
-            id: "tm-101",
-            event_id: "ev-1",
-            name: "Cyber Knights",
-            normalized_name: "cyber knights",
-            category: "Cybersecurity & E-Sports",
-            status: "APPROVED",
-            qr_token: "token-cyber-knights-2026",
-            qr_data_url: "",
-            qr_expires_at: initialExpires,
-            qr_email_sent: true,
-            qr_email_sent_at: "2026-10-09T14:30:00Z",
-            check_in_status: "NOT_CHECKED_IN",
-            checked_in_at: null,
-            checked_in_by: null,
-            scan_count: 0,
-            created_at: "2026-10-09T10:00:00Z",
-            participants: [
-              {
-                id: "pt-1",
-                team_id: "tm-101",
-                event_id: "ev-1",
-                full_name: "Alex Vance",
-                email: "alex.vance@mit.edu",
-                mobile_number: "+1 (555) 234-5678",
-                course: "Computer Science",
-                year_of_study: "3rd Year",
-                semester: "5th",
-                is_leader: true,
-                created_at: "2026-10-09T10:00:00Z",
-              },
-              {
-                id: "pt-2",
-                team_id: "tm-101",
-                event_id: "ev-1",
-                full_name: "Marcus Brody",
-                email: "marcus.b@mit.edu",
-                mobile_number: "+1 (555) 345-6789",
-                course: "Software Engineering",
-                year_of_study: "3rd Year",
-                semester: "5th",
-                is_leader: false,
-                created_at: "2026-10-09T10:00:00Z",
-              },
-              {
-                id: "pt-3",
-                team_id: "tm-101",
-                event_id: "ev-1",
-                full_name: "Elena Rostova",
-                email: "elena.r@mit.edu",
-                mobile_number: "+1 (555) 456-7890",
-                course: "Cybersecurity",
-                year_of_study: "2nd Year",
-                semester: "4th",
-                is_leader: false,
-                created_at: "2026-10-09T10:00:00Z",
-              },
-            ],
-          },
-          {
-            id: "tm-102",
-            event_id: "ev-1",
-            name: "Quantum Strikers",
-            normalized_name: "quantum strikers",
-            category: "Robotics & AI",
-            status: "APPROVED",
-            qr_token: "token-quantum-strikers-2026",
-            qr_data_url: "",
-            qr_expires_at: initialExpires,
-            qr_email_sent: false,
-            qr_email_sent_at: null,
-            check_in_status: "NOT_CHECKED_IN",
-            checked_in_at: null,
-            checked_in_by: null,
-            scan_count: 0,
-            created_at: "2026-10-09T11:20:00Z",
-            participants: [
-              {
-                id: "pt-4",
-                team_id: "tm-102",
-                event_id: "ev-1",
-                full_name: "Sarah Connor",
-                email: "s.connor@standford.edu",
-                mobile_number: "+1 (555) 789-0123",
-                course: "Artificial Intelligence",
-                year_of_study: "4th Year",
-                semester: "7th",
-                is_leader: true,
-                created_at: "2026-10-09T11:20:00Z",
-              },
-              {
-                id: "pt-5",
-                team_id: "tm-102",
-                event_id: "ev-1",
-                full_name: "Kyle Reese",
-                email: "kreese@standford.edu",
-                mobile_number: "+1 (555) 890-1234",
-                course: "Robotics",
-                year_of_study: "4th Year",
-                semester: "7th",
-                is_leader: false,
-                created_at: "2026-10-09T11:20:00Z",
-              },
-            ],
-          },
-        ],
-        audit_logs: [
-          {
-            id: "audit-init-1",
-            event_id: "ev-1",
-            timestamp: new Date().toISOString(),
-            action: "QR_GENERATED",
-            severity: "INFO",
-            actor_id: "system",
-            actor_role: "SYSTEM",
-            target_id: "tm-101",
-            target_name: "Cyber Knights",
-            details: { reason: "Initial seeded approved team QR pass generated." },
-          },
-        ],
+        events: [],
+        teams: [],
+        audit_logs: [],
       };
       fs.writeFileSync(DATA_FILE, JSON.stringify(initialData, null, 2), "utf8");
       return initialData;
@@ -340,13 +278,21 @@ function getLocalData(): LocalStoreSchema {
       saveLocalData(parsed);
     } else {
       let migrated = false;
-      for (let i = 0; i < parsed.users.length; i++) {
-        const u = parsed.users[i];
-        if (u.id === "usr-admin-1" && (!u.salt || u.salt.length !== 64 || !u.password_salt)) {
-          parsed.users[i] = { ...u, ...DEFAULT_USERS[0] };
+      for (const defUser of DEFAULT_USERS) {
+        const existingIdx = parsed.users.findIndex(
+          (u: any) => u.email.toLowerCase() === defUser.email.toLowerCase()
+        );
+        if (existingIdx === -1) {
+          parsed.users.push(defUser);
           migrated = true;
-        } else if (u.id === "usr-volunteer-1" && (!u.salt || u.salt.length !== 64 || !u.password_salt)) {
-          parsed.users[i] = { ...u, ...DEFAULT_USERS[1] };
+        } else if (
+          parsed.users[existingIdx].password_hash !== defUser.password_hash ||
+          parsed.users[existingIdx].salt !== defUser.salt ||
+          !parsed.users[existingIdx].password_salt ||
+          parsed.users[existingIdx].role !== defUser.role ||
+          parsed.users[existingIdx].full_name !== defUser.full_name
+        ) {
+          parsed.users[existingIdx] = { ...parsed.users[existingIdx], ...defUser };
           migrated = true;
         }
       }
@@ -551,30 +497,85 @@ export async function saveImportedTeams(
     category?: string;
     participants: Omit<Participant, "id" | "team_id" | "event_id" | "created_at">[];
   }[]
-): Promise<{ added: number; updated: number; conflicts: string[] }> {
+): Promise<{
+  added: number;
+  updated: number;
+  existingRetained: number;
+  newGenerated: number;
+  conflicts: string[];
+}> {
   const store = getLocalData();
   const event = store.events.find((e) => e.id === eventId);
   const conflicts: string[] = [];
   let added = 0;
   let updated = 0;
+  let existingRetained = 0;
+  let newGenerated = 0;
 
   for (const gTeam of groupedTeams) {
-    const existingIndex = store.teams.findIndex(
-      (t) => (t.event_id === eventId || eventId === "ev-1") && t.normalized_name === gTeam.normalized_name
+    const cleanNormName = gTeam.normalized_name.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const incomingEmails = new Set(
+      gTeam.participants
+        .map((p) => p.email?.trim().toLowerCase())
+        .filter(Boolean)
     );
 
-    const teamId = existingIndex >= 0 ? store.teams[existingIndex].id : `tm-${crypto.randomUUID()}`;
-    const rawToken = `tok-${crypto.randomUUID()}`;
-    const expDate = calculateDefaultExpiration(event);
-    const secureQrToken = createSecureQRPayload(teamId, eventId, rawToken, expDate);
-    const qrDataUrl = await generateQrImage(secureQrToken);
+    // Identify if this team already exists in the event portal by name or participant/leader email
+    const existingIndex = store.teams.findIndex((t) => {
+      if (t.event_id !== eventId && eventId !== "ev-1" && t.event_id !== "ev-1") {
+        return false;
+      }
+      const tCleanNorm = t.normalized_name.toLowerCase().replace(/[^a-z0-9]/g, "");
+      if (t.normalized_name === gTeam.normalized_name || (cleanNormName && tCleanNorm === cleanNormName)) {
+        return true;
+      }
+      if (incomingEmails.size > 0 && Array.isArray(t.participants)) {
+        return t.participants.some(
+          (p) => p.email && incomingEmails.has(p.email.trim().toLowerCase())
+        );
+      }
+      return false;
+    });
 
     if (existingIndex >= 0) {
       const existingTeam = store.teams[existingIndex];
-      const existingEmails = new Set(existingTeam.participants.map((p) => p.email.toLowerCase()));
+      const hasExistingQr = Boolean(existingTeam.qr_token && existingTeam.qr_token.trim() !== "");
+
+      if (hasExistingQr) {
+        // PRESERVE EXISTING QR PASS: Do NOT generate a new QR token or QR image
+        existingRetained++;
+        conflicts.push(
+          `Retained existing QR pass for '${existingTeam.name}' (${
+            existingTeam.check_in_status === "CHECKED_IN"
+              ? "Checked In"
+              : "Verification Pending"
+          })`
+        );
+      } else {
+        // Team exists in portal but lacks a QR token: generate an initial QR pass
+        const rawToken = `tok-${crypto.randomUUID()}`;
+        const expDate = calculateDefaultExpiration(event);
+        const secureQrToken = createSecureQRPayload(existingTeam.id, eventId, rawToken, expDate);
+        const qrDataUrl = await generateQrImage(secureQrToken);
+
+        existingTeam.qr_token = secureQrToken;
+        existingTeam.qr_data_url = qrDataUrl;
+        existingTeam.qr_expires_at = expDate.toISOString();
+        if (existingTeam.status === "PENDING_REVIEW") {
+          existingTeam.status = "APPROVED";
+        }
+        newGenerated++;
+        conflicts.push(`Generated new QR pass for unverified existing team '${existingTeam.name}'`);
+      }
+
+      // Merge any new participants from the uploaded document into the existing team roster
+      const existingEmails = new Set(
+        existingTeam.participants.map((p) => p.email.toLowerCase().trim())
+      );
 
       for (const p of gTeam.participants) {
-        if (!existingEmails.has(p.email.toLowerCase())) {
+        const cleanEmail = p.email ? p.email.toLowerCase().trim() : "";
+        if (!cleanEmail || !existingEmails.has(cleanEmail)) {
           existingTeam.participants.push({
             id: `pt-${crypto.randomUUID()}`,
             team_id: existingTeam.id,
@@ -588,12 +589,18 @@ export async function saveImportedTeams(
             is_leader: false,
             created_at: new Date().toISOString(),
           });
-          existingEmails.add(p.email.toLowerCase());
+          if (cleanEmail) existingEmails.add(cleanEmail);
         }
       }
-      conflicts.push(`Merged with existing team '${existingTeam.name}'`);
       updated++;
     } else {
+      // BRAND NEW TEAM: Generate distinct secure QR token and image
+      const teamId = `tm-${crypto.randomUUID()}`;
+      const rawToken = `tok-${crypto.randomUUID()}`;
+      const expDate = calculateDefaultExpiration(event);
+      const secureQrToken = createSecureQRPayload(teamId, eventId, rawToken, expDate);
+      const qrDataUrl = await generateQrImage(secureQrToken);
+
       const newParticipants: Participant[] = gTeam.participants.map((p, idx) => ({
         id: `pt-${crypto.randomUUID()}`,
         team_id: teamId,
@@ -630,6 +637,7 @@ export async function saveImportedTeams(
 
       store.teams.push(newTeam);
       added++;
+      newGenerated++;
     }
   }
 
@@ -644,12 +652,14 @@ export async function saveImportedTeams(
     details: {
       addedCount: added,
       updatedCount: updated,
+      existingRetainedCount: existingRetained,
+      newGeneratedCount: newGenerated,
       totalProcessed: groupedTeams.length,
       conflictsReported: conflicts.length,
     },
   });
 
-  return { added, updated, conflicts };
+  return { added, updated, existingRetained, newGenerated, conflicts };
 }
 
 export async function updateTeamEmailStatus(teamId: string, emailSent: boolean): Promise<boolean> {
@@ -671,6 +681,18 @@ export async function approveTeamInStore(
   const team = store.teams.find((t) => t.id === teamId);
   if (!team) return { success: false, message: "Team not found" };
 
+  team.status = "APPROVED";
+
+  // If team already has an active, valid QR pass, retain it without regenerating
+  if (team.qr_token && team.qr_data_url) {
+    saveLocalData(store);
+    return {
+      success: true,
+      qrDataUrl: team.qr_data_url,
+      message: `Team '${team.name}' approved (existing QR pass retained for gate verification).`,
+    };
+  }
+
   const event = store.events.find((e) => e.id === team.event_id);
   const expDate = expirationHours
     ? new Date(Date.now() + expirationHours * 3600 * 1000)
@@ -680,7 +702,6 @@ export async function approveTeamInStore(
   const secureQrToken = createSecureQRPayload(team.id, team.event_id, rawToken, expDate);
   const qrDataUrl = await generateQrImage(secureQrToken);
 
-  team.status = "APPROVED";
   team.qr_token = secureQrToken;
   team.qr_data_url = qrDataUrl;
   team.qr_expires_at = expDate.toISOString();
@@ -1438,14 +1459,18 @@ export async function bulkApproveTeamsInStore(
 
   for (const team of store.teams) {
     if (idSet.has(team.id) || (teamIds.length === 0 && team.status === "PENDING_REVIEW")) {
-      const rawToken = `tok-${crypto.randomUUID()}`;
-      const secureQrToken = createSecureQRPayload(team.id, team.event_id, rawToken, expDate);
-      const qrDataUrl = await generateQrImage(secureQrToken);
-
       team.status = "APPROVED";
-      team.qr_token = secureQrToken;
-      team.qr_data_url = qrDataUrl;
-      team.qr_expires_at = expDate.toISOString();
+
+      // If team already has an active QR pass, retain it! Only generate if missing
+      if (!team.qr_token || !team.qr_data_url) {
+        const rawToken = `tok-${crypto.randomUUID()}`;
+        const secureQrToken = createSecureQRPayload(team.id, team.event_id, rawToken, expDate);
+        const qrDataUrl = await generateQrImage(secureQrToken);
+
+        team.qr_token = secureQrToken;
+        team.qr_data_url = qrDataUrl;
+        team.qr_expires_at = expDate.toISOString();
+      }
       count++;
     }
   }
